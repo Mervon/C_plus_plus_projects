@@ -96,15 +96,62 @@ void SortByUser(const json& document, const string& filename) {
     json result;
 
     for (auto& item : document["transactions"sv].items()) {
-        std::string key;
+        std::string aa, dd, ee, ff, gg, key;
+        std::string bb;
+        std::string cc;
 
         for (auto& items : item.value().items()) {
-            if (items.key() == "account"sv)   {
+            if (items.key() == "last_name"sv)   {
+                aa = items.value().get<std::string>();
+            }
+            if (items.key() == "first_name"sv)   {
+                bb = items.value().get<std::string>();
+            }
+            if (items.key() == "patronymic"sv)   {
+                cc = items.value().get<std::string>();
+            }
+            if (items.key() == "passport"sv)   {
+                if (items.value().type_name() == "string") {
+                    dd = items.value().get<std::string>();
+                } else {
+                    dd = to_string(items.value().get<int>());
+                }
+            }
+            if (items.key() == "date_of_birth"sv)   {
+                ee = items.value().get<std::string>();
+            }
+            if (items.key() == "phone"sv)   {
+                ff = items.value().get<std::string>();
+            }
+            if (items.key() == "client"sv)   {
                 key = items.value().get<std::string>();
             }
+
+
+
         }
 
-        result["transactions"sv][key].push_back(item.value());
+        aa += bb;
+        aa += cc;
+        aa += dd;
+        aa += ee;
+        aa += ff;
+
+        auto a = item.value();
+        a.erase("last_name");
+        a.erase("first_name");
+        a.erase("patronymic");
+        a.erase("phone");
+        a.erase("first_name");
+        a.erase("passport_valid_to");
+        a.erase("passport");
+        //a.erase("account");
+        a.erase("account_valid_to");
+        a.erase("date_of_birth");
+        //a.erase("card");
+        //a.erase("client");
+
+        result["transactions"sv][key].push_back(a);
     }
 
     std::ofstream res_file(filename, ios_base::trunc);
@@ -121,14 +168,44 @@ void SearchForMaxUsers(const string& filename) {
     for (auto& item : data["transactions"sv].items()) {
         check[item.key()] = item.value().size();
     }
+    std::set<std::pair<int, std::string>> s;  // The new (temporary) container.
 
-    ofstream ofs("res2.txt");
+    for (auto const &kv : check)
+        s.emplace(kv.second, kv.first);  // Flip the pairs.
 
-    for (auto& item : check) {
-        if (item.second > 2) {
-            ofs << item.first << ":" << item.second << endl;
+    ofstream ofs("res2_2.txt");
+
+    for (auto it = --s.end(); it != s.begin(); --it) {
+        ofs << it->second << ":" << it->first << endl;
+    }
+    ofs << s.begin()->second << ":" << s.begin()->first << endl;
+}
+
+void SearchForMaxUsersAndUniqueCards(const string& filename) {
+    ifstream ifs(filename);
+    json data = json::parse(ifs);
+
+    map<string, set<string>> check;
+    for (auto& item : data["transactions"sv].items()) {
+        for (auto& item_2 : item.value().items()) {
+            cout << item_2.key() << endl;
         }
     }
+
+    cout << 1 << endl;
+    std::set<std::pair<int, std::string>> s;  // The new (temporary) container.
+    cout << 1 << endl;
+    for (auto const &kv : check)
+        s.emplace(kv.second.size(), kv.first);  // Flip the pairs.
+    cout << 1 << endl;
+    ofstream ofs("res2_3.txt");
+    cout << 1 << endl;
+    for (auto it = --s.end(); it != s.begin(); --it) {
+        ofs << it->second << ":" << it->first << endl;
+    }
+    cout << 1 << endl;
+    ofs << s.begin()->second << ":" << s.begin()->first << endl;
+    cout << 1 << endl;
 }
 
 int main() {
@@ -143,8 +220,9 @@ int main() {
     GetAllTransactionsTypes(data, "TransactionsTypes.txt");
     DeleteAddOperationsFromSource(data, "result_after_deleting_add.json");
     GetOnlySuccesOperations(data, "OnlySuccesOperations.json");
-    SortByUser(data, "sorted.json");
-    SearchForMaxUsers("sorted.json");
+    SortByUser(data, "sorted_2.json");
+    SearchForMaxUsers("sorted_2.json");
+    SearchForMaxUsersAndUniqueCards("sorted_2.json");
 }
 
 
