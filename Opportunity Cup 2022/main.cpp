@@ -185,27 +185,40 @@ void SearchForMaxUsersAndUniqueCards(const string& filename) {
     ifstream ifs(filename);
     json data = json::parse(ifs);
 
-    map<string, set<string>> check;
+    map<string, std::pair<int, set<string>>> check;
+
+    for (auto& item : data["transactions"sv].items()) {
+        check[item.key()].first = item.value().size();
+    }
+
     for (auto& item : data["transactions"sv].items()) {
         for (auto& item_2 : item.value().items()) {
-            cout << item_2.key() << endl;
+            for (auto& item_3 : item_2.value().items()){
+                if (item_3.key() == "card") {
+                    check[item.key()].second.insert(item_3.value());
+                }
+            }
+
+            //cout << item_2.value()["account"] << endl;
+
+            //cout << item_2.value() << endl;
         }
     }
 
-    cout << 1 << endl;
-    std::set<std::pair<int, std::string>> s;  // The new (temporary) container.
-    cout << 1 << endl;
+
+    std::set<std::pair<int, std::pair<int, std::string>>> s;  // The new (temporary) container.
+
     for (auto const &kv : check)
-        s.emplace(kv.second.size(), kv.first);  // Flip the pairs.
-    cout << 1 << endl;
+        s.insert({kv.second.second.size(), {kv.second.first, kv.first}});  // Flip the pairs.
+
     ofstream ofs("res2_3.txt");
-    cout << 1 << endl;
+
     for (auto it = --s.end(); it != s.begin(); --it) {
-        ofs << it->second << ":" << it->first << endl;
+        ofs << it->second.second << ":" << it->second.first << ":" << it->first << endl;
     }
-    cout << 1 << endl;
-    ofs << s.begin()->second << ":" << s.begin()->first << endl;
-    cout << 1 << endl;
+
+    ofs << s.begin()->second.second << ":" << s.begin()->first << ":" << s.begin()->second.first << endl;
+
 }
 
 int main() {
