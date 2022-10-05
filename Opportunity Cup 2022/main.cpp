@@ -11,6 +11,7 @@
 #include "C:\GitRepos\Json\json\single_include\nlohmann\json.hpp"
 #include "C:\GitRepos\Json\json\single_include\nlohmann\json_fwd.hpp"
 
+
 using namespace std;
 using json = nlohmann::json;
 
@@ -92,7 +93,7 @@ void GetOnlySuccesOperations(const json& document, const string& filename) {
     res_file << result.dump(4);
 }
 
-void SortByUser(const json& document, const string& filename) {
+void SortByKey(const string& sortingKey, const json& document, const string& filename) {
     json result;
 
     for (auto& item : document["transactions"sv].items()) {
@@ -123,8 +124,8 @@ void SortByUser(const json& document, const string& filename) {
             if (items.key() == "phone"sv)   {
                 ff = items.value().get<std::string>();
             }
-            if (items.key() == "client"sv)   {
-                key = items.value().get<std::string>();
+            if (items.key() == sortingKey)   {
+                key = to_string(items.value());
             }
 
 
@@ -151,14 +152,20 @@ void SortByUser(const json& document, const string& filename) {
         //a.erase("card");
         //a.erase("client");
 
-        result["transactions"sv][key].push_back(a);
+        result["transactions"sv][(string)key].push_back(a);
     }
 
     std::ofstream res_file(filename, ios_base::trunc);
+    if(sortingKey=="amount") {
 
-    res_file << result.dump(4);
+        for (auto &item: result["transactions"sv].items()) {
+            if (item.value().size() > 1)
+                res_file << item.key() << ":" << item.value() << "\n";
+        }
+    }
+    else
+        res_file << result.dump(4);
 }
-
 
 void SearchForMaxUsers(const string& filename) {
     ifstream ifs(filename);
@@ -213,12 +220,203 @@ void SearchForMaxUsersAndUniqueCards(const string& filename) {
 
     ofstream ofs("res2_3.txt");
 
+    std::vector<string> res_1;
+
     for (auto it = --s.end(); it != s.begin(); --it) {
+        if (it->first >= 10) {
+            res_1.push_back(it->second.second);
+        }
         ofs << it->second.second << ":" << it->second.first << ":" << it->first << endl;
     }
 
     ofs << s.begin()->second.second << ":" << s.begin()->first << ":" << s.begin()->second.first << endl;
 
+    if (s.begin()->second.first - s.begin()->first >= 10) {
+        res_1.push_back(s.begin()->second.second);
+    }
+
+    std::set<string> res_vec_1;
+
+    for (auto& item : data["transactions"sv].items()) {
+        for (auto& item_2 : item.value().items()) {
+            for (auto& item_3 : item_2.value().items()){
+                if (item_3.key() == "transaction" && find(res_1.begin(), res_1.end(), item.key()) != res_1.end()) {
+                    res_vec_1.insert(item_3.value());
+                }
+            }
+        }
+    }
+
+    ofstream res_111("big_result_1.txt");
+
+    bool is_first = false;
+
+    cout << res_vec_1.size() << endl;
+
+    for (auto& item_4 : res_vec_1) {
+        if (is_first) {
+            res_111 << ", ";
+        }
+
+        is_first = true;
+        res_111 << item_4;
+    }
+}
+
+void searchExpiredTransactions(const string& filename) {
+    ifstream ifs(filename);
+    json data = json::parse(ifs);
+
+    map<string, string> check;
+
+    for (auto& item : data["transactions"sv].items()) {
+        string accountValidTo = "";
+        for (auto &item_2: item.value().items())
+        {
+            if(item_2.key() == "account_valid_to") {
+                accountValidTo = item_2.value();
+            }
+            if(item_2.key() == "date") {
+                for (int i = 0; i < 10; i++)
+                    if (accountValidTo < ((string) item_2.value())) {
+                        //cout << accountValidTo + " " + (string) item_2.value() << endl;
+                        check[item.key()] = accountValidTo + " " + (string) item_2.value();
+                        continue;
+                    }
+            }
+        }
+    }
+
+    ofstream ofs("expiredTransactions.txt");
+
+    for (auto it = check.begin(); it != check.end(); ++it) {
+        ofs << it->first << ":" << it->second << endl;
+    }
+
+    ofstream ofs_2("BigResult_2.txt");
+
+    bool is_first = false;
+
+    for (auto it = check.begin(); it != check.end(); ++it) {
+        if (is_first) {
+            ofs_2 << ", ";
+        }
+        is_first = true;
+        ofs_2 << it->first;
+    }
+}
+
+void searchRepeatAmount(const string& filename) {
+    ifstream ifs(filename);
+    json data = json::parse(ifs);
+
+
+    map<string, string> check;
+
+    for (auto& item : data["transactions"sv].items()) {
+        string accountValidTo = "";
+        for (auto &item_2: item.value().items())
+        {
+            if(item_2.key() == "account_valid_to") {
+                accountValidTo = item_2.value();
+            }
+            if(item_2.key() == "date") {
+                for (int i = 0; i < 10; i++)
+                    if (accountValidTo < ((string) item_2.value())) {
+                        //cout << accountValidTo + " " + (string) item_2.value() << endl;
+                        check[item.key()] = accountValidTo + " " + (string) item_2.value();
+                        continue;
+                    }
+            }
+        }
+    }
+
+    ofstream ofs("repeatAmount.txt");
+
+    for (auto it = check.begin(); it != check.end(); ++it) {
+
+        ofs << it->first << ":" << it->second << endl;
+    }
+}
+
+void SortByUser(const json& document, const string& filename) {
+    json result;
+
+    for (auto& item : document["transactions"sv].items()) {
+        std::string aa, dd, ee, ff, gg, key;
+        std::string bb;
+        std::string cc;
+        std::string transaction = item.key();
+
+        for (auto& items : item.value().items()) {
+            if (items.key() == "last_name"sv)   {
+                aa = items.value().get<std::string>();
+            }
+            if (items.key() == "first_name"sv)   {
+                bb = items.value().get<std::string>();
+            }
+            if (items.key() == "patronymic"sv)   {
+                cc = items.value().get<std::string>();
+            }
+            if (items.key() == "passport"sv)   {
+                if (items.value().type_name() == "string") {
+                    dd = items.value().get<std::string>();
+                } else {
+                    dd = to_string(items.value().get<int>());
+                }
+            }
+            if (items.key() == "date_of_birth"sv)   {
+                ee = items.value().get<std::string>();
+            }
+            if (items.key() == "phone"sv)   {
+                ff = items.value().get<std::string>();
+            }
+            if (items.key() == "client"sv)   {
+                key = items.value().get<std::string>();
+            }
+
+
+
+        }
+
+        aa += bb;
+        aa += cc;
+        aa += dd;
+        aa += ee;
+        aa += ff;
+
+        auto a = item.value();
+        a.push_back({"transaction", transaction});
+        a.erase("last_name");
+        a.erase("first_name");
+        a.erase("patronymic");
+        a.erase("phone");
+        a.erase("first_name");
+        a.erase("passport_valid_to");
+        a.erase("passport");
+        //a.erase("account");
+        a.erase("account_valid_to");
+        a.erase("date_of_birth");
+        //a.erase("card");
+        //a.erase("client");
+
+        result["transactions"sv][key].push_back(a);
+    }
+
+    std::ofstream res_file(filename, ios_base::trunc);
+
+    res_file << result.dump(4);
+}
+
+void GetBadTransactions_1(const string& input_filename, const string& output_filename) {
+    ifstream ifs(input_filename);
+
+    json data = json::parse(ifs);
+
+    for (auto& item : data["transactions"sv].items()) {
+
+
+    }
 }
 
 int main() {
@@ -230,12 +428,18 @@ int main() {
     std::ifstream input_file(input_file_name);
     json data = json::parse(input_file);
 
-    GetAllTransactionsTypes(data, "TransactionsTypes.txt");
+    //searchExpiredTransactions(input_file_name);
+    //SortByKey("client", data, "sorted_by_key.json");
+
+
+
+    /*GetAllTransactionsTypes(data, "TransactionsTypes.txt");
     DeleteAddOperationsFromSource(data, "result_after_deleting_add.json");
     GetOnlySuccesOperations(data, "OnlySuccesOperations.json");
     SortByUser(data, "sorted_2.json");
     SearchForMaxUsers("sorted_2.json");
     SearchForMaxUsersAndUniqueCards("sorted_2.json");
+    GetBadTransactions_1("sorted_2.json", "result_1.txt");*/
+    searchExpiredTransactions("transactions.json");
+    //searchRepeatAmount("transactions.json");
 }
-
-
