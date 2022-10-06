@@ -71,7 +71,7 @@ bool DateIsNight(const string& date) {
     return stoi(date.substr(11, 2)) >= 0 && stoi(date.substr(11, 2)) < 6;
 }
 
-void Fraud_4(const string& filename, long long int interval) {
+void Fraud_5(const string& filename, long long int interval) {
     ifstream ifs(filename);
     json data = json::parse(ifs);
 
@@ -142,7 +142,7 @@ void Fraud_4(const string& filename, long long int interval) {
     }
 }
 
-void Fraud_5(const string& filename) {
+void Fraud_6(const string& filename) {
     ifstream ifs(filename);
     json data = json::parse(ifs);
 
@@ -206,6 +206,6 @@ int main() {
 
     SortByClient(data, data_sorted_by_client_filename);
 
-    Fraud_4(data_sorted_by_client_filename, 900);
-    Fraud_5(data_sorted_by_client_filename);
+    Fraud_5(data_sorted_by_client_filename, 900);
+    Fraud_6(data_sorted_by_client_filename);
 }
