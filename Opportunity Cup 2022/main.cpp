@@ -7,6 +7,8 @@
  * Результат выполнения программы - два файла "BIG_RES_5.txt" и "BIG_RES_5.txt"
  * в "BIG_RES_5.txt" находятся все транзакции попавшие под 5 паттерн
  * в "BIG_RES_6.txt" находятся все транзакции попавшие под 6 паттерн
+ * Так же данный код можно найти в Git репозитории:
+ * "https://github.com/Mervon/C_plus_plus_projects/tree/main/Opportunity%20Cup%202022"
 */
 
 #include <iostream>
