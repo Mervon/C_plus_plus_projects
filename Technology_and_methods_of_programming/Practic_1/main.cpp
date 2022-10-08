@@ -1,5 +1,5 @@
 #include <iostream>
-#include <vector>
+#include <ctime>
 #include "PtrBasedQueueAdapter.h"
 
 using namespace std;
@@ -129,11 +129,41 @@ void Test_5() {
     q.Display();
 }
 
+void CheckTimeForHeap(int n) {
+    PtrBasedQueueAdapter q;
+
+    for (int i = 0; i < n; ++i) {
+        q.Push(rand());
+    }
+
+    auto start_time = clock();
+    //q.Display();
+    q.HeapSort();
+    //q.Display();
+    cout << float(clock() - start_time) / CLOCKS_PER_SEC << endl;
+}
+
+void CheckTimeForBubble(int n) {
+    PtrBasedQueueAdapter q;
+
+    for (int i = 0; i < n; ++i) {
+        q.Push(rand());
+    }
+
+    auto start_time = clock();
+    //q.Display();
+    q.BubbleSort();
+    //q.Display();
+    cout << float(clock() - start_time) / CLOCKS_PER_SEC << endl;
+}
+
 int main() {
     //Test_1();
     //Test_2();
     //Test_3();
     //Test_4();
-    Test_5();
+    //Test_5();
+    CheckTimeForHeap(10000);
+    CheckTimeForBubble(1000);
     return 0;
 }
