@@ -5,73 +5,47 @@ using namespace std;
 class PtrBasedQueue {
     struct Node; //forward declaration
 public:
-    PtrBasedQueue() { // O(1)
-        head_ = nullptr;
-        tail_ = nullptr;
-        size_ = 0;
+    PtrBasedQueue() { // 1 + 1 + 1 = 3
+        head_ = nullptr; // 1
+        tail_ = nullptr; // 1
+        size_ = 0; // 1
     }
 
-    void Push(int value) { // O(1)
-        Node* new_node = new Node();
-        new_node->value_ = value;
-        if (size_ == 0) {
-            new_node->next_ = nullptr;
-            head_ = new_node;
-            tail_ = new_node;
-        } else {
-            tail_->next_ = new_node;
-            tail_ = new_node;
+    void Push(int value) { // 3 + 2 + 4 + 1 = 10
+        Node* new_node = new Node(); // 1 + 1 + 1 = 3
+        new_node->value_ = value; // 1 + 1 = 2
+        if (size_ == 0) { // 2 + 1 + 1 = 4; max(4, 3) = 4
+            new_node->next_ = nullptr; // 1 + 1 = 2
+            head_ = new_node; // 1
+            tail_ = new_node; // 1
+        } else { // 2 + 1 = 3
+            tail_->next_ = new_node; // 1 + 1 = 2
+            tail_ = new_node; // 1
         }
 
-        size_++;
+        size_++; // 1
     }
 
-    void Pop() { // O(1)
-        Node* node_to_pop = head_;
+    void Pop() { // 2 + 2 + 1 + 1 = 6
+        Node* node_to_pop = head_; // 1 + 1 = 2
 
-        head_ = head_->next_;
+        head_ = head_->next_; // 1 + 1 = 2
 
-        delete node_to_pop;
+        delete node_to_pop; // 1
 
-        size_--;
+        size_--; // 1
     }
 
-    size_t Size() { // O(1)
-        return size_;
+    size_t Size() { // 1
+        return size_; // 1
     }
 
-    void Display() { // O(n)
-        Node* head = head_;
-
-        bool is_first = false;
-
-        for (int i = 0; i < size_; i++) {
-            if (is_first) {
-                cout << " ";
-            }
-            is_first = true;
-            cout << head->value_;
-            head = head->next_;
-        }
-        cout << endl;
+    int& Front() { // 2
+        return head_->value_; // 1 + 1 = 2
     }
 
-    int Front() { // O(1)
-        return head_->value_;
-    }
-
-    int& GetElementByIndex(int index) { // O(n)
-        if (index >= 0 && index < size_) {
-            Node* head = head_;
-            for (int i = 0; i < index + 1; ++i) {
-                if (i == index) {
-                    return head->value_;
-                }
-                head = head->next_;
-            }
-        } else {
-            throw std::out_of_range("Index out of range!");
-        }
+    int& Back() { // 2
+        return tail_->value_; // 1 + 1 = 2
     }
 
 private:
