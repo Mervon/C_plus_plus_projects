@@ -60,9 +60,9 @@ public:
         return head_->value_;
     }
 
-    int& GetElementByIndex(int index) {
+    int &GetElementByIndex(int index) {
         if (index >= 0 && index < size_) {
-            Node* head = head_;
+            Node *head = head_;
             for (int i = 0; i < index + 1; ++i) {
                 if (i == index) {
                     return head->value_;

@@ -65,7 +65,7 @@ void Test_3() {
     q.Push(4);
     q.Push(5);
     q.Display();
-    int& a = q.GetElementByIndex(4);
+    int &a = q.GetElementByIndex(4);
     a = 454;
     q.Display();
     a = 4544;
