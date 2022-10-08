@@ -30,11 +30,11 @@ public:
         return queue_->Front();
     }
 
-    int &GetElementByIndex(int index) {
+    int& GetElementByIndex(int index) {
         return queue_->GetElementByIndex(index);
     }
 
-    int &operator[](int index) {
+    int& operator[](int index) {
         return GetElementByIndex(index);
     }
 
@@ -81,6 +81,6 @@ private:
         }
     }
 
-    PtrBasedQueue *queue_;
-    PtrBasedQueueAdapter &self_;
+    PtrBasedQueue* queue_;
+    PtrBasedQueueAdapter& self_;
 };

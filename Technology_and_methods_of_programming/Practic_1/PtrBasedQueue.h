@@ -12,7 +12,7 @@ public:
     }
 
     void Push(int value) {
-        Node *new_node = new Node();
+        Node* new_node = new Node();
         new_node->value_ = value;
         if (size_ == 0) {
             new_node->next_ = nullptr;
@@ -27,7 +27,7 @@ public:
     }
 
     void Pop() {
-        Node *node_to_pop = head_;
+        Node* node_to_pop = head_;
 
         head_ = head_->next_;
 
@@ -41,7 +41,7 @@ public:
     }
 
     void Display() {
-        Node *head = head_;
+        Node* head = head_;
 
         bool is_first = false;
 
@@ -60,9 +60,9 @@ public:
         return head_->value_;
     }
 
-    int &GetElementByIndex(int index) {
+    int& GetElementByIndex(int index) {
         if (index >= 0 && index < size_) {
-            Node *head = head_;
+            Node* head = head_;
             for (int i = 0; i < index + 1; ++i) {
                 if (i == index) {
                     return head->value_;
@@ -77,9 +77,9 @@ public:
 private:
     struct Node {
         int value_;
-        Node *next_;
+        Node* next_;
     };
     size_t size_;
-    Node *head_;
-    Node *tail_;
+    Node* head_;
+    Node* tail_;
 };
