@@ -50,6 +50,15 @@ public:
         }
     }
 
+    /*
+     * Heap sorting - first of we need to make heap from source queue
+     * that can be done within O(N) operations,
+     * and then we need to swap first element with last, and make heap
+     * again on the data[0,size-1], that can be done within O(log(N))
+     * operations. The total operation count is O(N + (N * log(N))) =
+     * O(N * log(N))
+     */
+
     void HeapSort() { // O(N*log(N))
         int n = Size();
 
