@@ -116,13 +116,13 @@ void Test_5() {
     q.Push(43);
     q.Push(-11);
     q.Push(-65);
+    cout << "Before sorting:" << endl;
     q.Display();
-
-    cout << endl;
 
     q.HeapSort();
-
+    cout << "After sorting:" << endl;
     q.Display();
+    cout << "Check for saving queue property:" << endl;
     cout << q.Front() << endl;
     q.Push(1);
     cout << q.Front() << endl;
@@ -134,6 +134,6 @@ int main() {
     //Test_2();
     //Test_3();
     //Test_4();
-    //Test_5();
+    Test_5();
     return 0;
 }

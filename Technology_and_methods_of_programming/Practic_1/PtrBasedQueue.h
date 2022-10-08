@@ -11,7 +11,7 @@ public:
         size_ = 0;
     }
 
-    void Push(int value) {
+    void Push(int value) { // O(1)
         Node* new_node = new Node();
         new_node->value_ = value;
         if (size_ == 0) {
@@ -26,7 +26,7 @@ public:
         size_++;
     }
 
-    void Pop() {
+    void Pop() { // O(1)
         Node* node_to_pop = head_;
 
         head_ = head_->next_;
@@ -36,11 +36,11 @@ public:
         size_--;
     }
 
-    size_t Size() {
+    size_t Size() { // O(1)
         return size_;
     }
 
-    void Display() {
+    void Display() { // O(n)
         Node* head = head_;
 
         bool is_first = false;
@@ -56,11 +56,11 @@ public:
         cout << endl;
     }
 
-    int Front() {
+    int Front() { // O(1)
         return head_->value_;
     }
 
-    int& GetElementByIndex(int index) {
+    int& GetElementByIndex(int index) { // O(n)
         if (index >= 0 && index < size_) {
             Node* head = head_;
             for (int i = 0; i < index + 1; ++i) {

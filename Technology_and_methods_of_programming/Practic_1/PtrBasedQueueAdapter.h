@@ -38,7 +38,7 @@ public:
         return GetElementByIndex(index);
     }
 
-    void BubbleSort() {
+    void BubbleSort() { // O(n^2)
         for (int i = 0; i < Size(); ++i) {
             for (int j = 0; j < Size() - 1; ++j) {
                 if (self_[j] > self_[j + 1]) {
@@ -50,7 +50,7 @@ public:
         }
     }
 
-    void HeapSort() {
+    void HeapSort() { // O(N*log(N))
         int n = Size();
 
         for (int i = n / 2 - 1; i >= 0; --i) {
