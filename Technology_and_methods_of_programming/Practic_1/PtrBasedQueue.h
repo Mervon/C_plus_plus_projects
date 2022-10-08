@@ -5,7 +5,7 @@ using namespace std;
 class PtrBasedQueue {
     struct Node; //forward declaration
 public:
-    PtrBasedQueue() {
+    PtrBasedQueue() { // O(1)
         head_ = nullptr;
         tail_ = nullptr;
         size_ = 0;

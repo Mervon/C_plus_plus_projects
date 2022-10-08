@@ -6,35 +6,35 @@ using namespace std;
 
 class PtrBasedQueueAdapter {
 public:
-    PtrBasedQueueAdapter() : self_(*this) {
+    PtrBasedQueueAdapter() : self_(*this) { // O(1)
         queue_ = new PtrBasedQueue;
     }
 
-    void Display() {
+    void Display() { // O(N)
         queue_->Display();
     }
 
-    void Push(int value) {
+    void Push(int value) { // O(1)
         queue_->Push(value);
     }
 
-    void Pop() {
+    void Pop() { // O(1)
         queue_->Pop();
     }
 
-    size_t Size() {
+    size_t Size() { // O(1)
         return queue_->Size();
     }
 
-    int Front() {
+    int Front() { // O(1)
         return queue_->Front();
     }
 
-    int& GetElementByIndex(int index) {
+    int& GetElementByIndex(int index) { // O(N)
         return queue_->GetElementByIndex(index);
     }
 
-    int& operator[](int index) {
+    int& operator[](int index) { // O(N)
         return GetElementByIndex(index);
     }
 
@@ -73,7 +73,7 @@ public:
     }
 
 private:
-    void Heapify(int end, int start) {
+    void Heapify(int end, int start) { // At most O(N), but log(N) if the data was already heap before
         int largest = start;
         int left = start * 2 + 1;
         int right = start * 2 + 2;
