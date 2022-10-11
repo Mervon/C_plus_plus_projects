@@ -11,202 +11,26 @@
  * "https://github.com/Mervon/C_plus_plus_projects/tree/main/Opportunity%20Cup%202022"
 */
 
-#include <iostream>
 #include <windows.h>
 #include <fstream>
 #include <set>
-#include <cmath>
+
 /*
  * сторонняя библиотека для работа с json в C++, чтобы она заработала, нужно создать папку, куда будем её
  * скачивать, далле запустить git bash и перейти в эту папку посредством команды "cd <Полный путь до созданной папки>"
  * далее прописать команду "git clone https://github.com/nlohmann/json.git"
  * ждать пока скачается и потом подключить библиотеку посредством двух #include директив
 */
+
 #include "C:\GitRepos\Json\json\single_include\nlohmann\json.hpp"
 #include "C:\GitRepos\Json\json\single_include\nlohmann\json_fwd.hpp"
 
+#include "Fraud_5.h"
+#include "Fraud_6.h"
+#include "common.h"
+
 using namespace std;
 using json = nlohmann::json;
-
-string SortDataByKey(const json& document, const string& sorting_key) {
-    json result;
-
-    for (auto& item: document["transactions"sv].items()) {
-        std::string key;
-        std::string transaction = item.key();
-
-        for (auto& items: item.value().items()) {
-            if (items.key() == sorting_key) {
-                if (items.value().is_string()) {
-                    key = items.value().get<std::string>();
-                } else {
-                    key = to_string(items.value().get<int>());
-                }
-            }
-        }
-
-        auto a = item.value();
-        a.push_back({"transaction", transaction});
-        result["transactions"sv][key].push_back(a);
-    }
-
-    string result_filename = "Sorted_by_" + sorting_key + ".json";
-
-    std::ofstream res_file(result_filename, ios_base::trunc);
-
-    res_file << result.dump(4);
-
-    return result_filename;
-}
-
-long long int DateToNumber(const string& date) {
-    long long int year, month, day, hour, minute, sec;
-    try {
-        year = stoi(date.substr(0, 4)) * 365 * 24 * 3600;
-        month = stoi(date.substr(5, 2)) * 30 * 24 * 3600;
-        day = stoi(date.substr(8, 2)) * 24 * 3600;
-        hour = stoi(date.substr(11, 2)) * 3600;
-        minute = stoi(date.substr(14, 2)) * 60;
-        sec = stoi(date.substr(17, 2));
-        return year + month + day + hour + minute + sec;
-    }
-    catch (exception& e) {
-        cerr << "DateToNumber() fall with that date\n:" << date << ":" << endl;
-        throw;
-    }
-}
-
-bool DateIsNight(const string& date) {
-    long long int hour;
-    try {
-        hour = stoi(date.substr(11, 2)) * 3600;
-    } catch (exception& e) {
-        cerr << "DateIsNight() fall with that date\n:" << date << ":" << endl;
-        throw;
-    }
-    return hour >= 0 && hour < 6;
-}
-
-void Fraud_5(const string& filename, long long int interval) {
-    ifstream ifs(filename);
-    json data = json::parse(ifs);
-
-    vector<string> result;
-
-    for (auto& item_1: data["transactions"].items()) {
-        string prev_data, current_data;
-        string prev_city, current_city;
-        string prev_transaction, curr_transaction;
-
-        bool skip_first = true;
-
-        for (auto& item_2: item_1.value().items()) {
-            if (skip_first) {
-                for (auto& item_3: item_2.value().items()) {
-                    if (item_3.key() == "date") {
-                        prev_data = item_3.value();
-                    } else if (item_3.key() == "city") {
-                        prev_city = item_3.value();
-                    } else if (item_3.key() == "transaction") {
-                        prev_transaction = item_3.value();
-                    }
-                }
-                skip_first = false;
-                continue;
-            } else {
-                for (auto& item_3: item_2.value().items()) {
-                    if (item_3.key() == "date") {
-                        current_data = item_3.value();
-                    } else if (item_3.key() == "city") {
-                        current_city = item_3.value();
-                    } else if (item_3.key() == "transaction") {
-                        curr_transaction = item_3.value();
-                    }
-                }
-
-                long long int prev = DateToNumber(prev_data);
-                long long int curr = DateToNumber(current_data);
-
-                if (std::abs(curr - prev) <= interval && current_city != prev_city) {
-                    result.push_back(prev_transaction);
-                    result.push_back(curr_transaction);
-
-                }
-
-                prev_data = current_data;
-                prev_transaction = curr_transaction;
-                prev_city = current_city;
-            }
-        }
-    }
-
-    std::set<string> res;
-
-    for (auto& item: result) {
-        res.insert(item);
-    }
-    ofstream ofs_2("BIG_RES_5.txt");
-
-    bool is_first = false;
-
-    for (auto& item: res) {
-        if (is_first) {
-            ofs_2 << ", ";
-        }
-        is_first = true;
-        ofs_2 << item;
-    }
-}
-
-void Fraud_6(const string& filename) {
-    ifstream ifs(filename);
-    json data = json::parse(ifs);
-
-    set<string> result;
-
-    for (auto& item_1: data["transactions"].items()) {
-        string prev_data, current_data;
-        string prev_city, current_city;
-        string prev_transaction, curr_transaction;
-        string date;
-        vector<string> transactions;
-
-        bool is_good = true;
-
-        for (auto& item_2: item_1.value().items()) {
-            for (auto& item_3: item_2.value().items()) {
-                if (item_3.key() == "date") {
-                    date = item_3.value();
-                } else if (item_3.key() == "transaction") {
-                    transactions.push_back(item_3.value());
-                }
-            }
-
-            if (!DateIsNight(date)) {
-                is_good = false;
-                break;
-            }
-        }
-
-        if (is_good && transactions.size() > 2) {
-            for (auto& item: transactions) {
-                result.insert(item);
-            }
-        }
-    }
-
-    ofstream ofs_2("BIG_RES_6.txt");
-
-    bool is_first = false;
-
-    for (auto& item: result) {
-        if (is_first) {
-            ofs_2 << ", ";
-        }
-        is_first = true;
-        ofs_2 << item;
-    }
-}
 
 int main() {
     SetConsoleOutputCP(CP_UTF8);
@@ -221,6 +45,6 @@ int main() {
 
     string sorted_data_filename = SortDataByKey(data, sorting_key);
 
-    Fraud_5(sorted_data_filename, 900);
-    Fraud_6(sorted_data_filename);
+    Fraud_5::Solve(sorted_data_filename, 900);
+    Fraud_6::Solve(sorted_data_filename);
 }
