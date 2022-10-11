@@ -28,16 +28,20 @@
 using namespace std;
 using json = nlohmann::json;
 
-void SortByClient(const json& document, const string& filename) {
+string SortDataByKey(const json& document, const string& sorting_key) {
     json result;
 
-    for (auto& item : document["transactions"sv].items()) {
+    for (auto& item: document["transactions"sv].items()) {
         std::string key;
         std::string transaction = item.key();
 
-        for (auto& items : item.value().items()) {
-            if (items.key() == "client"sv)   {
-                key = items.value().get<std::string>();
+        for (auto& items: item.value().items()) {
+            if (items.key() == sorting_key) {
+                if (items.value().is_string()) {
+                    key = items.value().get<std::string>();
+                } else {
+                    key = to_string(items.value().get<int>());
+                }
             }
         }
 
@@ -46,9 +50,13 @@ void SortByClient(const json& document, const string& filename) {
         result["transactions"sv][key].push_back(a);
     }
 
-    std::ofstream res_file(filename, ios_base::trunc);
+    string result_filename = "Sorted_by_" + sorting_key + ".json";
+
+    std::ofstream res_file(result_filename, ios_base::trunc);
 
     res_file << result.dump(4);
+
+    return result_filename;
 }
 
 long long int DateToNumber(const string& date) {
@@ -60,15 +68,23 @@ long long int DateToNumber(const string& date) {
         hour = stoi(date.substr(11, 2)) * 3600;
         minute = stoi(date.substr(14, 2)) * 60;
         sec = stoi(date.substr(17, 2));
+        return year + month + day + hour + minute + sec;
     }
-    catch(exception& e) {
+    catch (exception& e) {
         cerr << "DateToNumber() fall with that date\n:" << date << ":" << endl;
+        throw;
     }
-    return year + month + day + hour + minute + sec;
 }
 
 bool DateIsNight(const string& date) {
-    return stoi(date.substr(11, 2)) >= 0 && stoi(date.substr(11, 2)) < 6;
+    long long int hour;
+    try {
+        hour = stoi(date.substr(11, 2)) * 3600;
+    } catch (exception& e) {
+        cerr << "DateIsNight() fall with that date\n:" << date << ":" << endl;
+        throw;
+    }
+    return hour >= 0 && hour < 6;
 }
 
 void Fraud_5(const string& filename, long long int interval) {
@@ -77,16 +93,16 @@ void Fraud_5(const string& filename, long long int interval) {
 
     vector<string> result;
 
-    for (auto& item_1 : data["transactions"].items()) {
+    for (auto& item_1: data["transactions"].items()) {
         string prev_data, current_data;
         string prev_city, current_city;
         string prev_transaction, curr_transaction;
 
         bool skip_first = true;
 
-        for (auto& item_2 : item_1.value().items()) {
+        for (auto& item_2: item_1.value().items()) {
             if (skip_first) {
-                for (auto &item_3: item_2.value().items()) {
+                for (auto& item_3: item_2.value().items()) {
                     if (item_3.key() == "date") {
                         prev_data = item_3.value();
                     } else if (item_3.key() == "city") {
@@ -98,7 +114,7 @@ void Fraud_5(const string& filename, long long int interval) {
                 skip_first = false;
                 continue;
             } else {
-                for (auto& item_3 : item_2.value().items()) {
+                for (auto& item_3: item_2.value().items()) {
                     if (item_3.key() == "date") {
                         current_data = item_3.value();
                     } else if (item_3.key() == "city") {
@@ -126,14 +142,14 @@ void Fraud_5(const string& filename, long long int interval) {
 
     std::set<string> res;
 
-    for (auto& item : result) {
+    for (auto& item: result) {
         res.insert(item);
     }
     ofstream ofs_2("BIG_RES_5.txt");
 
     bool is_first = false;
 
-    for (auto& item : res) {
+    for (auto& item: res) {
         if (is_first) {
             ofs_2 << ", ";
         }
@@ -148,7 +164,7 @@ void Fraud_6(const string& filename) {
 
     set<string> result;
 
-    for (auto& item_1 : data["transactions"].items()) {
+    for (auto& item_1: data["transactions"].items()) {
         string prev_data, current_data;
         string prev_city, current_city;
         string prev_transaction, curr_transaction;
@@ -157,8 +173,8 @@ void Fraud_6(const string& filename) {
 
         bool is_good = true;
 
-        for (auto& item_2 : item_1.value().items()) {
-            for (auto& item_3 : item_2.value().items()) {
+        for (auto& item_2: item_1.value().items()) {
+            for (auto& item_3: item_2.value().items()) {
                 if (item_3.key() == "date") {
                     date = item_3.value();
                 } else if (item_3.key() == "transaction") {
@@ -173,7 +189,7 @@ void Fraud_6(const string& filename) {
         }
 
         if (is_good && transactions.size() > 2) {
-            for (auto& item : transactions) {
+            for (auto& item: transactions) {
                 result.insert(item);
             }
         }
@@ -183,7 +199,7 @@ void Fraud_6(const string& filename) {
 
     bool is_first = false;
 
-    for (auto& item : result) {
+    for (auto& item: result) {
         if (is_first) {
             ofs_2 << ", ";
         }
@@ -199,13 +215,12 @@ int main() {
     string data_filename = "transactions.json";
 
     ifstream ifs(data_filename);
-
     json data = json::parse(ifs);
 
-    string data_sorted_by_client_filename = "sortedByClient.json";
+    string sorting_key = "client"s;
 
-    SortByClient(data, data_sorted_by_client_filename);
+    string sorted_data_filename = SortDataByKey(data, sorting_key);
 
-    Fraud_5(data_sorted_by_client_filename, 900);
-    Fraud_6(data_sorted_by_client_filename);
+    Fraud_5(sorted_data_filename, 900);
+    Fraud_6(sorted_data_filename);
 }
