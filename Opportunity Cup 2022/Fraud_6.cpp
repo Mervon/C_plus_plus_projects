@@ -1,20 +1,8 @@
 #include "Fraud_6.h"
-#include "common.h"
-
-#include <fstream>
-#include <vector>
-#include <set>
-
-#include "C:\GitRepos\Json\json\single_include\nlohmann\json.hpp"
-#include "C:\GitRepos\Json\json\single_include\nlohmann\json_fwd.hpp"
 
 using namespace std;
-using json = nlohmann::json;
 
-void Fraud_6::Solve(const string& filename) {
-    ifstream ifs(filename);
-    json data = json::parse(ifs);
-
+string Fraud_6::Solve(const json& data, int amount) {
     set<string> result;
 
     for (auto& item_1: data["transactions"].items()) {
@@ -41,14 +29,16 @@ void Fraud_6::Solve(const string& filename) {
             }
         }
 
-        if (is_good && transactions.size() > 2) {
+        if (is_good && transactions.size() > amount) {
             for (auto& item: transactions) {
                 result.insert(item);
             }
         }
     }
 
-    ofstream ofs_2("BIG_RES_6.txt");
+    string res_filename = "BIG_RES_" + to_string(GLOBAL_NUMBER_OF_OUTPUTS++) + ".txt";
+
+    ofstream ofs_2(res_filename, ios_base::trunc);
 
     bool is_first = false;
 
@@ -59,4 +49,6 @@ void Fraud_6::Solve(const string& filename) {
         is_first = true;
         ofs_2 << item;
     }
+
+    return res_filename;
 }

@@ -2,7 +2,9 @@
 
 #include <string>
 
-class Fraud_5 {
+#include "common.h"
+
+class Fraud_5 : public Solver {
 public:
-    static void Solve(const std::string& filename, long long int interval);
+    static std::string Solve(const json& data, long long int interval);
 };
