@@ -89,8 +89,22 @@ string SortDataByKeyForAnalise(const json& document, const string& sorting_key) 
         a.erase("client");
         a.erase("date_of_birth");
         a.erase("terminal_type");
+        //a.erase("account");
+        a.erase("address");
         result["transactions"sv][key].push_back(a);
     }
+
+    /*for (auto& item : document["transactions"sv].items()) {
+        int i = 0;
+        for (auto& item_1 : item.value().items()) {
+            for (auto& item_2 : item.value().items()) {
+                i++;
+            }
+        }
+        if (i > 2) {
+            cout << item.key() << endl;
+        }
+    }*/ // FUNNY, VERY FUNNY GENERATED FINAL DATA SBER!
 
     string result_filename = "Sorted_by_" + sorting_key + "_for_analise.json";
 
@@ -102,20 +116,32 @@ string SortDataByKeyForAnalise(const json& document, const string& sorting_key) 
 }
 
 long long int DateToNumber(const string& date) {
-    long long int year, month, day, hour, minute, sec;
-    try {
-        year = stoi(date.substr(0, 4)) * 365ll * 24ll * 3600ll;
-        month = stoi(date.substr(5, 2)) * 30ll * 24ll * 3600ll;
-        day = stoi(date.substr(8, 2)) * 24ll * 3600ll;
-        hour = stoi(date.substr(11, 2)) * 3600ll;
-        minute = stoi(date.substr(14, 2)) * 60ll;
-        sec = stoi(date.substr(17, 2));
-        return year + month + day + hour + minute + sec;
+    long long int year, month, day, hour = 0, minute = 0, sec = 0;
+    if (date.size() == 10) {
+        try {
+            year = stoi(date.substr(0, 4)) * 365ll * 24ll * 3600ll;
+            month = stoi(date.substr(5, 2)) * 30ll * 24ll * 3600ll;
+            day = stoi(date.substr(8, 2)) * 24ll * 3600ll;
+            return year + month + day + hour + minute + sec;
+        } catch (exception& e) {
+            cerr << "DateToNumber() fall with that date\n:" << date << ":" << endl;
+            throw;
+        }
+    } else if (date.size() == 19) {
+        try {
+            year = stoi(date.substr(0, 4)) * 365ll * 24ll * 3600ll;
+            month = stoi(date.substr(5, 2)) * 30ll * 24ll * 3600ll;
+            day = stoi(date.substr(8, 2)) * 24ll * 3600ll;
+            hour = stoi(date.substr(11, 2)) * 3600ll;
+            minute = stoi(date.substr(14, 2)) * 60ll;
+            sec = stoi(date.substr(17, 2));
+            return year + month + day + hour + minute + sec;
+        } catch (exception& e) {
+            cerr << "DateToNumber() fall with that date\n:" << date << ":" << endl;
+            throw;
+        }
     }
-    catch (exception& e) {
-        cerr << "DateToNumber() fall with that date\n:" << date << ":" << endl;
-        throw;
-    }
+
 }
 
 bool DateIsNight(const string& date) {

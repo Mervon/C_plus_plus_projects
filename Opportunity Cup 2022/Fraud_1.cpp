@@ -5,10 +5,13 @@ using namespace std;
 string Fraud_1::Solve(const json& data, int amount) {
     set<string> bad_transactions;
 
+    ofstream ofs_2("tmp_1.txt");
+
     for (auto& item: data["transactions"].items()) {
         set<string> unique_cards;
         vector<string> cards;
         vector<string> transactions;
+
         for (auto& item2: item.value().items()) {
 
             for (auto& item3: item2.value().items()) {
@@ -21,6 +24,7 @@ string Fraud_1::Solve(const json& data, int amount) {
                     transactions.push_back(item3.value());
                 }
             }
+
         }
 
         if (unique_cards.size() > amount) {
@@ -28,6 +32,8 @@ string Fraud_1::Solve(const json& data, int amount) {
                 bad_transactions.insert(transaction);
             }
         }
+
+        ofs_2 << item.key() << ":" << unique_cards.size() << ":" << cards.size() << endl;
 
         transactions.clear();
         unique_cards.clear();
