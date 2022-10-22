@@ -140,7 +140,7 @@ void CheckTimeForHeap(const string& unsorted_filename, const string& sorted_file
         ifs >> i;
         q.Push(i);
     }
-cout << q.Size() << endl;
+    cout << q.Size() << endl;
     auto start_time = clock();
     //q.Display();
     q.HeapSort();
@@ -202,22 +202,21 @@ int main() {
     //Test_5();
     string unsorted_filename = "1.txt";
     string sorted_filename = "2.txt";
-    /*
-    int n = 3000;
-    ofstream ofs(unsorted_filename);
-    bool is_first = false;
-    for (int i = 0; i < n; ++i) {
-        if (is_first) {
-            ofs << " ";
-        }
-        is_first = true;
-        ofs << rand();
-    }
-    ofs.close();
-    */
 
-    CheckTimeForHeap(unsorted_filename, sorted_filename); // 76.3 sec // 74.255 + 74.063 + 74.77 + 6.338
-    //CheckTimeForBubble(600); // 64.1 sec
-    //Test_6();
+    int n = 300;
+    for (int test = n; test <= 3000; test = test + 300) {
+        ofstream ofs(unsorted_filename);
+        bool is_first = false;
+        for (int i = 0; i < test; ++i) {
+            if (is_first) {
+                ofs << " ";
+            }
+            is_first = true;
+            ofs << rand();
+        }
+        ofs.close();
+        CheckTimeForHeap(unsorted_filename, sorted_filename);
+    }
+
     return 0;
 }
