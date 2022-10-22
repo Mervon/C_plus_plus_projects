@@ -110,23 +110,35 @@ public:
      * O(N * log(N))
      */
 
-    void HeapSort() { // O(N*log(N))
+    void HeapSort() { // 3 + N / 2 * log2(N) * (176 * N + 133) + N ^ 2 * (88 + 176 * log2(N)) + N * (59 + 133 * log2(N)) =
+        // = 3 + (176 * N * log2(N) + 133 * log2(N)) * N / 2 + N ^ 2 * (88 + 176 * log2(N)) + N * (59 + 133 * log2(N)) =
+        // = 3 + N ^ 2 * 88 * log2(N) + N * 67 * log2(N) + N ^ 2 * (88 + 176 * log2(N)) + N * (59 + 133 * log2(N)) =
+        // = 3 + N ^ 2 * (88 * log2(N) + 88 + 176 * log2(N)) + N * (59 + 133 * log2(N)) =
+        // = N ^ 2 * (88 + 264 * log2(N)) + N * (59 + 133 * log2(N)) + 3
         int n = Size(); // 1 + 2 = 3
 
-        for (int i = n / 2 - 1; i >= 0; --i) { // N / 2 * log2(N) * (176 * N + 133)
+        for (int i = n / 2 - 1; i >= 0; --i) { // N / 2 * log2(N) * (176 * N + 133) =
+            // = N / 2 * log2(N) * 176 * N + 133 * N / 2 * log2(N)
             Heapify(n, i); // log2(N) * (176 * N + 133)
         }
 
-        for (int i = n - 1; i > 0; i--) { // (N - 1) *
+        for (int i = n - 1; i > 0; i--) { // (N - 1) * (22 * N + 15 + 44 * N + 29 + 22 * N + 15 + log2(N) * (176 * N + 133)) =
+            // = (N - 1) * (88 * N + 59 + 176 * log2(N) * N + 133 * log2(N))
+            // = 88 * N ^ 2 + 59 * N + 176 * N ^ 2 * log2(N) + 133 * log2(N) * N
+            // = N ^ 2 * (88 + 176 * log2(N)) + N * (59 + 133 + log2(N))
             int a = self_[0]; // 1 + 22 * N + 14 = 22 * N + 15
             self_[0] = self_[i]; // 1 + 22 * N + 14 + 22 * N + 14 = 44 * N + 29
             self_[i] = a; // 1 + 22 * N + 14 = 22 * N + 15
-            Heapify(i, 0);
+            Heapify(i, 0); // log2(N) * (176 * N + 133)
         }
+
+        //Итоговая оценка: N ^ 2 * (88 + 264 * log2(N)) + N * (59 + 133 * log2(N)) + 3
     }
 
 private:
     void Heapify(int end, int start) { // 2 + 4 + 4 + 44 * N + 32 + 44 * N + 32 + 22 * N + 15 + 44 * N + 29 + 22 * N + 15 = 176 * N + 133
+        // -> худший случай log2(N) * (176 * N + 133) =
+        // = 176 * N * log2(N) + 133 * log2(N)
         int largest = start; // 1 + 1 = 2
         int left = start * 2 + 1; // 1 + 1 + 1 + 1 = 4
         int right = start * 2 + 2; // 1 + 1 + 1 + 1 = 4
@@ -137,15 +149,14 @@ private:
         if (right < end && self_[right] > self_[largest]) { // 1 + 22 * N + 14 + 1 + 22 * N + 14 + 1 + 1 = 44 * N + 32
             largest = right; // 1
         }
-        if (largest == start) {
-            return;
+        if (largest == start) { // 1 + 1 = 2
+            return; // 1
         }
 
         int a = self_[largest]; // 1 + 22 * N + 14 = 22 * N + 15
         self_[largest] = self_[start]; // 1 + 22 * N + 14 + 22 * N + 14 = 44 * N + 29
         self_[start] = a; // 1 + 22 * N + 14 = 22 * N + 15
         Heapify(end, largest); //-> выполняется в худшем случае log2(N) раз, иными словами это цикл с log2(N) итераций
-        // log2(N) * 176 * N + 133
     }
 
     PtrBasedQueue* queue_;
